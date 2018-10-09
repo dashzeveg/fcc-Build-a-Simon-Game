@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Build a Simon Game</title>
+  
+  
+  
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+        <!-- svg1 -->
+        <svg height="0" width="0" style="position: absolute;">
+          <defs>
+            <clipPath id="clipping">
+              <circle cx="150" cy="150" r="150" />
+            </clipPath>
+          </defs>
+        </svg>
+
+        <!-- svg2 -->
+        <svg height="0" width="0" style="position: absolute;">
+          <defs>
+            <clipPath id="clipping2">
+              <circle cx="140" cy="140" r="140" />
+            </clipPath>
+          </defs>
+        </svg>
+        
+        <!-- svg3 -->
+        <svg height="0" width="0" style="position: absolute;">
+          <defs>
+            <clipPath id="clipping3">
+              <circle cx="140" cy="140" r="140" />
+            </clipPath>
+          </defs>
+        </svg>
+
+        <!-- svg4 -->
+        <svg height="0" width="0" style="position: absolute;">
+          <defs>
+            <clipPath clipPathUnits="objectBoundingBox" id="sector">
+              <path fill="none" stroke="#111" stroke-width="1" className="sector" d="M0.5,0.5 l0.5,0 A0.5,0.5 0 0,0 0.5,0 z"></path>
+            </clipPath>
+          </defs>
+        </svg>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+
+  
+
+    <script  src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>

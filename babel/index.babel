@@ -1,0 +1,350 @@
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div>
+        <Main />
+        <Author />
+      </div>
+    );
+  }
+}
+
+class Main extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { power: false, 
+                  strict: false,
+                  display: '',
+                  count: 0, 
+                  arr: [], 
+                  currentIndex: 0, 
+                  bg1: {background: '#ff3333'},
+                  bg2: {background: '#009900'},
+                  bg3: {background: '#ffd700'},
+                  bg4: {background: '#3333ff'},
+                  clickable: 'nonclickable'
+                 };
+    
+    this.setInt = 0;
+    this.setInt1 = 0;
+    this.n = 0;
+    this.timeleft = 5;
+    
+    this.power = this.power.bind(this);
+    this.strict = this.strict.bind(this);
+    this.start = this.start.bind(this);
+    this.saveArr = this.saveArr.bind(this);
+    this.displayCount = this.displayCount.bind(this);
+    this.btn = this.btn.bind(this);
+    this.click = this.click.bind(this);
+    this.blinkDisplay = this.blinkDisplay.bind(this);
+    this.playLoop = this.playLoop.bind(this);
+    this.play = this.play.bind(this);
+  }
+  
+  power() {
+    
+    clearInterval(this.downloadTimer);
+    clearInterval(this.setInt1);
+    
+    if(this.state.power === true){
+      this.setState({ 
+                  power: false, 
+                  strict: false,
+                  display: '',
+                  count: 0, 
+                  arr: [], 
+                  currentIndex: 0, 
+                  bg1: {background: '#ff3333'},
+                  bg2: {background: '#009900'},
+                  bg3: {background: '#ffd700'},
+                  bg4: {background: '#3333ff'},
+                  clickable: 'nonclickable'
+      });
+    }else{
+      this.setState({
+                  power: true, 
+                  strict: false,
+                  display: '--',
+                  count: 0, 
+                  arr: [], 
+                  currentIndex: 0, 
+                  bg1: {background: '#ff3333'},
+                  bg2: {background: '#009900'},
+                  bg3: {background: '#ffd700'},
+                  bg4: {background: '#3333ff'},
+                  clickable: 'nonclickable'              
+      });
+    }
+  }
+  
+  strict() {
+    if(this.state.power === true){
+      if(this.state.strict === true){
+        this.setState({ strict: false });
+      }else{
+        this.setState({ strict: true });
+      }
+    }
+  }
+  
+  start() {
+    if(this.state.power === true){
+      
+      let c = 1;
+      this.setState({ count: c, clickable: 'nonclickable' });
+      
+      this.saveArr(c);   
+      
+      this.n = 4;
+      this.setInt = setInterval(function(){ this.blinkDisplay('--', true); }.bind(this), 300);
+      
+    }
+  }
+  
+  blinkDisplay(sym, p) {
+    this.setState({ display: this.state.display === '' ? sym : '' });
+    this.n--;
+    if(this.n <= 0){
+      clearInterval(this.setInt);
+      if(p === true){
+        this.setState({ display: this.state.count });
+        this.playLoop(); 
+      }
+    }
+  }
+  
+  btn(n) {
+    this.timeleft = 5;
+    
+    let a = this.state.arr.slice();
+    //console.log("currentIndex"+this.state.currentIndex);
+    if(n == a[this.state.currentIndex]){
+      this.click(n, 200);
+      this.setState({ currentIndex: ++this.state.currentIndex });
+      
+      
+      
+      if(this.state.count == this.state.currentIndex){
+        if(this.state.count >= 21){
+           clearInterval(this.downloadTimer);
+           clearInterval(this.setInt1);
+           this.setState({
+                    count: 0, 
+                    arr: [], 
+                    currentIndex: 0, 
+                    clickable: 'nonclickable',
+                    display: 'WON'
+           });
+        }else{
+          setTimeout(function() { 
+            let c = this.state.count + 1;
+            this.setState({ count: c, display: c, currentIndex: 0 });
+            this.saveArr(c);
+            this.playLoop();
+          }.bind(this), 1000);
+        }
+      }
+      
+    }else{
+      this.click(5, 500);
+      
+      if(this.state.strict === true){
+        this.setState({
+                  count: 0, 
+                  arr: [], 
+                  currentIndex: 0, 
+                  clickable: 'nonclickable'              
+        });
+        
+        this.n = 6;
+        this.setInt = setInterval(function(){ this.blinkDisplay('!!', false); }.bind(this), 300);
+        
+      }else{
+        this.n = 4;
+        this.setInt = setInterval(function(){ this.blinkDisplay('--', true); }.bind(this), 300);
+      }
+    }
+  }
+  
+  playLoop() {
+    this.setState({ clickable: 'nonclickable' });
+    this.setInt1 = setInterval(this.play, 1000);
+  }
+  
+  play() {
+    clearInterval(this.downloadTimer);
+    
+    if(this.state.power === true){
+      
+      let a = this.state.arr.slice();
+      this.click(a[this.state.currentIndex], 1000);
+
+      this.setState({ currentIndex: ++this.state.currentIndex });
+      //console.log("count:"+this.state.count);
+      //console.log("currentIndex:"+this.state.currentIndex);
+      if(this.state.count == this.state.currentIndex){
+        clearInterval(this.setInt1);
+        this.setState({ currentIndex: 0 });
+        if(this.state.clickable === 'nonclickable')
+           this.setState({ clickable: 'clickable' });
+
+          this.timeleft = 5;
+          this.downloadTimer = setInterval(function(){
+          this.timeleft--;
+          if(this.timeleft <= 0){
+              clearInterval(this.downloadTimer);
+              this.btn(5);
+          }
+          }.bind(this),1000);
+      }
+    }
+  }
+  
+  click(n, t) {
+    if(n == 1){
+      this.audioBeep.src = 'https://s3.amazonaws.com/freecodecamp/simonSound1.mp3';
+      
+      this.setState({ bg1: {background: '#ff0000'} });
+      setTimeout(function() { this.setState({ bg1: {background: '#ff3333'} }); }.bind(this), t);
+    }else if(n == 2){
+      this.audioBeep.src = 'https://s3.amazonaws.com/freecodecamp/simonSound2.mp3';
+      
+      this.setState({ bg2: {background: '#00cc00'} });
+      setTimeout(function() { this.setState({ bg2: {background: '#009900'} }); }.bind(this), t);
+    }else if(n == 3){
+      this.audioBeep.src = 'https://s3.amazonaws.com/freecodecamp/simonSound3.mp3';
+      
+      this.setState({ bg3: {background: '#ffff00'} });
+      setTimeout(function() { this.setState({ bg3: {background: '#ffd700'} }); }.bind(this), t);
+    }else if(n == 4){
+      this.audioBeep.src = 'https://s3.amazonaws.com/freecodecamp/simonSound4.mp3';
+      
+      this.setState({ bg4: {background: '#0000ff'} });
+      setTimeout(function() { this.setState({ bg4: {background: '#3333ff'} }); }.bind(this), t);
+    }else{
+      this.audioBeep.src = 'https://www.soundjay.com/misc/fail-buzzer-01.mp3';
+    }
+    
+    this.audioBeep.play();
+    
+  }
+  
+  saveArr(n) {
+    let a = [];
+    for(i = 0; i < n; i++){
+      a[i] = Math.floor(Math.random() * 4) + 1;
+    }
+    
+    this.setState({arr: a});
+    
+    //arr.push(a);
+    //this.setState({arr: arr});
+    
+    //console.log('saveArr:');
+    //console.log(a);
+  }
+  
+  displayCount(n) {
+    if(n != '' && n != '--'){
+      if(n < 10)
+        n = '0'+n;   
+
+      return n;
+    }
+    return n; 
+  }
+
+  render() {
+    return (
+      <div className="main">
+        <div className="line1"></div>
+        <div className="line2"></div>
+        
+        {/* svg1 */}
+
+        <div className="bgcircle1"></div>
+        
+        {/* svg2 */}
+
+        <div className="bgcircle2"></div>
+        
+        {/* svg3 */}
+        
+        <div className="center">
+          <div className="item1"><h1 className="brand">Simon<span className="small">®</span></h1></div>
+          <div className="item2"></div>
+          <div className="item3"></div>
+          <div className="item4"><button className={this.state.strict === true ? 'button3 button3bg1': 'button3 button3bg2'}></button></div>
+          <div className="item5">
+            <div className="count">{this.displayCount(this.state.display)}</div>
+          </div>
+          <div className="item6"><button className="button1" onClick={this.start}></button></div>  
+          <div className="item7"><button className="button2" onClick={this.strict}></button></div>
+          <div className="item8">COUNT</div>
+          <div className="item9">START</div>  
+          <div className="item10">STRICT</div>
+          <div className="item11">
+            <div className="power1">OFF</div>
+            <div className="power2">
+              <label className="switch">
+                <input type="checkbox" checked={this.state.power} onClick={this.power} />
+                <span className="slider round"></span>
+              </label>
+            </div>
+            <div className="power3"> ON</div>
+          </div>
+        </div>
+        
+        <svg height="520" width="520" className="bgcircle">
+          <circle cx="260" cy="260" r="260" stroke="black" stroke-width="0" fill="#333" />
+        </svg>
+        
+        <ul className="menu">
+          <li className="one" style={this.state.bg1}>
+            <div className={"btn " + this.state.clickable} onClick={()=>{this.btn(1)}}></div>
+          </li>
+          <li className="two" style={this.state.bg2}>
+            <div className={"btn " + this.state.clickable} onClick={()=>{this.btn(2)}}></div>
+          </li>
+          <li className="three" style={this.state.bg3}>
+            <div className={"btn " + this.state.clickable} onClick={()=>{this.btn(3)}}></div>
+          </li>
+          <li className="four" style={this.state.bg4}>
+            <div className={"btn " + this.state.clickable} onClick={()=>{this.btn(4)}} ref={div => this.btnFour = div}></div>
+          </li>
+        </ul>
+        <audio id="beep" preload="auto" 
+          src="https://goo.gl/65cBl1" ref={(audio) => { this.audioBeep = audio; }} />
+        {/* svg4 */}
+        
+      </div>
+    );
+  }
+}
+
+class Author extends React.Component {
+  render() {
+    return (
+      <div className="author">
+        Designed and Coded By<br />
+        <a target="_blank" href="https://codepen.io/dashzeveg">Dashzeveg</a>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById('app'));
+
+/*
+$(document).ready(function(){
+  $('#app').click(function() {
+    $(this).css('color', 'red');
+  });
+});
+*/
